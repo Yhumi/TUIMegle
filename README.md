@@ -1,6 +1,9 @@
 # TUIMegle
 TUIMegle is a different way to experience Omegle. Born out of an annoyance with the basic CLI handling of Pymegle this small project was thrown together in an evening to bring a nice TUI experience to Omegle.
 
+## Running
+Using python 2.7.1 run `main.py` in a command line that support redirection. Tested in powershell.
+
 ## Setup file
 In order to use TUIMegle to its fullest there is a `setup_template.json` file included. First, go ahead and rename it to `setup.json` and then edit it as you wish.
 
