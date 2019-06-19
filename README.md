@@ -3,7 +3,7 @@ TUIMegle is a different way to experience Omegle. Born out of an annoyance with 
 
 ## Running & Usage
 Use `requirements.txt` to get the requirements.
-Using python 2.7.1 run `main.py` in a command line that support redirection. Tested in powershell. Avoid resizing as that messes with npyscreen a lot.
+Using python 2.7.1 run `main.py` in a command line that supports redirection. Tested in powershell. Avoid resizing as that messes with npyscreen a lot.
 
 After it's launched, typing and hitting enter will send a message. If you enter a command it will be ran, see commands below for a list of available commands.
 
