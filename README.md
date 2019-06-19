@@ -2,6 +2,7 @@
 TUIMegle is a different way to experience Omegle. Born out of an annoyance with the basic CLI handling of Pymegle this small project was thrown together in an evening to bring a nice TUI experience to Omegle.
 
 ## Running
+Use `requirements.txt` to get the requirements.
 Using python 2.7.1 run `main.py` in a command line that support redirection. Tested in powershell.
 
 ## Setup file
