@@ -1,9 +1,13 @@
 # TUIMegle
 TUIMegle is a different way to experience Omegle. Born out of an annoyance with the basic CLI handling of Pymegle this small project was thrown together in an evening to bring a nice TUI experience to Omegle.
 
-## Running
+## Running & Usage
 Use `requirements.txt` to get the requirements.
 Using python 2.7.1 run `main.py` in a command line that support redirection. Tested in powershell. Avoid resizing as that messes with npyscreen a lot.
+
+After it's launched, typing and hitting enter will send a message. If you enter a command it will be ran, see commands below for a list of available commands.
+
+On your first usage if connecting to Omegle is taking a long time, open Omegle in a browser and check if you have to solve a captcha. Solve it and then use the `/reload` command, this will allow the bot to connect to omegle.
 
 ## Setup file
 In order to use TUIMegle to its fullest there is a `setup_template.json` file included. First, go ahead and rename it to `setup.json` and then edit it as you wish.
