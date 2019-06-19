@@ -96,25 +96,30 @@ class omegleApplication(npyscreen.NPSAppManaged):
         if message.strip() == "":
             pass
 
-        #This command (/next) will move onto a new conversation
-        elif message.strip() == "/next":
-            self.client.next()
+        #This is a command (done so typos of commands don't send in embarassing fashion)
+        elif message.strip().startswith("/"):
+            #This command (/next) will move onto a new conversation
+            if message.strip() == "/next":
+                self.client.next()
 
-        #Stops the application
-        elif message.strip() == "/exit":
-            self.omegleBot.kill()
-            self.form.chat = []
-            self.client.disconnect()
+            #Stops the application
+            elif message.strip() == "/exit":
+                self.omegleBot.kill()
+                self.form.chat = []
+                self.client.disconnect()
 
-            self.form.Chat.entry_widget.buffer(["Exiting... Bye!"])
-            self.form.display()
-            time.sleep(5)
-            exit(0)
+                self.form.Chat.entry_widget.buffer(["Exiting... Bye!"])
+                self.form.display()
+                time.sleep(5)
+                exit(0)
 
-        #Recreates the bot - allowing you to update the setup.json
-        elif message.strip() == "/reload":
-            self.createBot()
+            #Recreates the bot - allowing you to update the setup.json
+            elif message.strip() == "/reload":
+                self.createBot()
 
+            else:
+                #Nothing will happen
+                pass
         #Anything else will be sent as a message
         else:
             self.client.send(message.strip())
