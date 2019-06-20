@@ -167,16 +167,20 @@ class omegleApplication(npyscreen.NPSAppManaged):
             pass
 
         #Send it
-        messageToSend = self.shortcuts[shortcut]
+        messagesToSend = self.shortcuts[shortcut]
 
-        if messageToSend == None or messageToSend == "":
+        if messagesToSend == None or len(messagesToSend) == 0:
             pass
 
-        #Send!
-        self.client.send(messageToSend)
+        #Send each message
+        for messageToSend in messagesToSend:
+            self.client.send(messageToSend)
 
-        outstring = "You: " + messageToSend
-        self.updateChat(outstring)
+            outstring = "You: " + messageToSend
+            self.updateChat(outstring)
+
+            #Wait a second between each
+            time.sleep(1)
 
 #Boxtitles for the widgets (makes it look prettier)
 class omegleChat(npyscreen.BoxTitle):

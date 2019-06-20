@@ -21,7 +21,8 @@ In order to use TUIMegle to its fullest there is a `setup_template.json` file in
 		"These are also optional"
 	],
 	"shortcuts": {
-		"example": "this will send if you do /example"
+		"example": ["this will send if you do /example"],
+		"multiline": ["this will send", "followed by this"]
 	}
 }
 ```

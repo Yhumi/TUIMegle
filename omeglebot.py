@@ -27,6 +27,9 @@ class OmegleBot(OmegleHandler):
         self.form.Chat.entry_widget.clearBuffer()
         self.form.Chat.entry_widget.buffer(["Searching for a stranger..."])
 
+        #Remove typing, as nobody is
+        self.form.Chat.footer = ""
+
         #Update the form
         self.form.display()
 
