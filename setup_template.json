@@ -2,5 +2,9 @@
     "startLine": "Hello, stranger",
     "topics": [
         "cooltopic1", "cooltopic2"
-    ]
+    ],
+	"shortcuts":
+	{
+		"trigger": "message"
+	}
 }

@@ -82,6 +82,7 @@ class omegleApplication(npyscreen.NPSAppManaged):
             clientdata = {}
             clientdata["startLine"] = ""
             clientdata["topics"] = []
+            clientdata["shortcuts"] = {}
 
             #Warn user
             self.updateChat("You have not created a setup.json file. Checkout the example version as this allows for topics & an optional automatic message. TUIMegle will continue with default settings in 5 seconds.")
@@ -92,6 +93,9 @@ class omegleApplication(npyscreen.NPSAppManaged):
             startline = None
         else:
             startline = clientdata["startLine"]
+
+        #Shortcut-list
+        self.shortcuts = clientdata["shortcuts"]
 
         #Reading from new setup
         self.omegleBot = OmegleBot(self.form, True, startline)
@@ -130,9 +134,15 @@ class omegleApplication(npyscreen.NPSAppManaged):
             elif message.strip() == "/reload":
                 self.createBot()
 
+            elif message.strip().startswith("/sc"):
+                #Get everything after first space
+                shortcutname = message.strip().split(" ", 1)[1]
+                
+                #Send shortcut
+                self.shortcutSend(shortcutname)
             else:
-                #Nothing will happen
-                pass
+                #Handles as if it's a shortcut
+                self.shortcutSend(message.strip()[1:])
         #Anything else will be sent as a message
         else:
             self.client.send(message.strip())
@@ -150,6 +160,23 @@ class omegleApplication(npyscreen.NPSAppManaged):
             self.form.Chat.entry_widget.buffer([outstring[i:i+lengthcap] for i in range(0, len(outstring), lengthcap)])
         else:
             self.form.Chat.entry_widget.buffer([outstring])
+
+    def shortcutSend(self, shortcut):
+        #Check we're good
+        if shortcut == None or shortcut == "":
+            pass
+
+        #Send it
+        messageToSend = self.shortcuts[shortcut]
+
+        if messageToSend == None or messageToSend == "":
+            pass
+
+        #Send!
+        self.client.send(messageToSend)
+
+        outstring = "You: " + messageToSend
+        self.updateChat(outstring)
 
 #Boxtitles for the widgets (makes it look prettier)
 class omegleChat(npyscreen.BoxTitle):
