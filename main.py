@@ -164,13 +164,13 @@ class omegleApplication(npyscreen.NPSAppManaged):
     def shortcutSend(self, shortcut):
         #Check we're good
         if shortcut == None or shortcut == "":
-            pass
+            return
 
         #Send it
         messagesToSend = self.shortcuts[shortcut]
 
         if messagesToSend == None or len(messagesToSend) == 0:
-            pass
+            return
 
         #Send each message
         for messageToSend in messagesToSend:
