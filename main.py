@@ -179,9 +179,6 @@ class omegleApplication(npyscreen.NPSAppManaged):
             outstring = "You: " + messageToSend
             self.updateChat(outstring)
 
-            #Wait a second between each
-            time.sleep(1)
-
 #Boxtitles for the widgets (makes it look prettier)
 class omegleChat(npyscreen.BoxTitle):
     _contained_widget = npyscreen.BufferPager
