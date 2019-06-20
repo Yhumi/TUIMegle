@@ -5,6 +5,7 @@ from omeglebot import OmegleBot
 from pyomegle import OmegleClient, OmegleHandler
 import time
 import json
+import pyperclip
 
 # Redirect stdout and stderr to files
 import sys
@@ -17,7 +18,8 @@ class omegleForm(npyscreen.FormBaseNew):
         handler = {
             curses.ascii.NL: self.sendMessage,
             curses.ascii.CR: self.sendMessage,
-            curses.KEY_ENTER: self.sendMessage
+            curses.KEY_ENTER: self.sendMessage,
+            "^V": self.pasteFromClipboard
         }
 
         #The chatbox
@@ -37,6 +39,17 @@ class omegleForm(npyscreen.FormBaseNew):
 
         #Ensure an update is ran regardless
         self.display()
+
+    def pasteFromClipboard(self, _input):
+        #Get clipboard
+        clipboardtext = pyperclip.paste()
+
+        #This is dirty
+        if isinstance(clipboardtext, basestring):
+            self.Message.entry_widget.value += clipboardtext
+            for _ in range(len(clipboardtext)):
+                self.Message.entry_widget.h_cursor_right(None)
+
 
 class omegleApplication(npyscreen.NPSAppManaged):
     def onStart(self):
