@@ -19,7 +19,10 @@ In order to use TUIMegle to its fullest there is a `setup_template.json` file in
 		"A topic",
 		"A second topic",
 		"These are also optional"
-	]
+	],
+	"shortcuts": {
+		"example": "this will send if you do /example"
+	}
 }
 ```
 
@@ -31,6 +34,7 @@ In order to use the program there are a number of commands that can be used.
  - `/next` - Sending this message will disconnect from the current chat and look for a new one.
  - `/exit` - This will cleanly exit the program, disconnecting you from the user and closing the application.
  - `/reload` - This reloads the bot and then looks for a new chat. Use this for on-the-fly updating of your topics/starting message without the need to reload the program entirely.
+ - `/sc example` - This looks for the shortcut "example" and then sends the message related to that, if found. You can also just do `/example` instead. Please not that shortcuts will not override the above commands for the sc-less variants. 
 
 ## Screenshots
 ![The application in use](https://loli.mafuyu.club/a6g3xTSsdo4n0CjRm92YBoA9yyHCMp3S.png)
