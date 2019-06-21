@@ -40,6 +40,10 @@ class omegleForm(npyscreen.FormBaseNew):
         #Ensure an update is ran regardless
         self.display()
 
+    def typingOverride(self, _input):
+        #Add the input to the console
+        self.Message.entry_widget.value += _input
+
     def pasteFromClipboard(self, _input):
         #Get clipboard
         clipboardtext = pyperclip.paste()
@@ -49,7 +53,6 @@ class omegleForm(npyscreen.FormBaseNew):
             self.Message.entry_widget.value += clipboardtext
             for _ in range(len(clipboardtext)):
                 self.Message.entry_widget.h_cursor_right(None)
-
 
 class omegleApplication(npyscreen.NPSAppManaged):
     def onStart(self):
@@ -145,8 +148,11 @@ class omegleApplication(npyscreen.NPSAppManaged):
                 self.shortcutSend(message.strip()[1:])
         #Anything else will be sent as a message
         else:
+            #Send the message & stop typing
             self.client.send(message.strip())
+            self.client.stopped_typing()
 
+            #Add to the chat
             outstring = "You: " + message.strip()
             self.updateChat(outstring)
 
@@ -166,9 +172,14 @@ class omegleApplication(npyscreen.NPSAppManaged):
         if shortcut == None or shortcut == "":
             return
 
-        #Send it
-        messagesToSend = self.shortcuts[shortcut]
+        #Attempt to get the message to send
+        try:
+            messagesToSend = self.shortcuts[shortcut]
+        except KeyError:
+            #Do nothing if there isn't one found
+            return
 
+        #If we manage to get to this point despite there not being a message, we'll just exit
         if messagesToSend == None or len(messagesToSend) == 0:
             return
 
@@ -179,12 +190,29 @@ class omegleApplication(npyscreen.NPSAppManaged):
             outstring = "You: " + messageToSend
             self.updateChat(outstring)
 
+    def userIsTyping(self):
+        #Checks the value of the textbox to see if the user is typing
+        #NOTE: Seems always return false? 
+        if self.form.Message.value != "":
+            self.client.typing()
+        else:
+            self.client.stopped_typing()
+
+#Customtextbox
+class omegleTextbox(npyscreen.Textfield):
+    def edit(self):
+        #Do the usual
+        super(omegleTextbox, self).edit()
+
+        #Also check to see if we're typing or not
+        self.parent.parentApp.userIsTyping()
+
 #Boxtitles for the widgets (makes it look prettier)
 class omegleChat(npyscreen.BoxTitle):
     _contained_widget = npyscreen.BufferPager
 
 class omegleMessageBox(npyscreen.BoxTitle):
-    _contained_widget = npyscreen.Textfield
+    _contained_widget = omegleTextbox
 
 #Start the app
 if __name__ == "__main__":
