@@ -6,11 +6,12 @@ from pyomegle import OmegleClient, OmegleHandler
 import time
 import json
 import pyperclip
+import codecs
 
 # Redirect stdout and stderr to files
 import sys
-sys.stdout = open('logging/stdout.log', 'w')
-sys.stderr = open('logging/stderr.log', 'w')
+sys.stdout = codecs.open('logging/stdout.log', 'w', encoding="utf-8")
+sys.stderr = codecs.open('logging/stderr.log', 'w', encoding="utf-8")
 
 class omegleForm(npyscreen.FormBaseNew):
     def create(self):
@@ -143,6 +144,11 @@ class omegleApplication(npyscreen.NPSAppManaged):
                 
                 #Send shortcut
                 self.shortcutSend(shortcutname)
+
+            elif message.strip() == "/disp":
+                #Forces a full display refresh - good in case messages have hung without displaying for some reason?
+                self.form.DISPLAY()
+
             else:
                 #Handles as if it's a shortcut
                 self.shortcutSend(message.strip()[1:])
