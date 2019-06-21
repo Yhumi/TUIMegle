@@ -1,5 +1,5 @@
 # TUIMegle
-TUIMegle is a different way to experience Omegle. Born out of an annoyance with the basic CLI handling of Pymegle this small project was thrown together in an evening to bring a nice TUI experience to Omegle.
+TUIMegle is a different way to experience Omegle. Born out of an annoyance with the basic CLI handling of Pyomegle this small project was thrown together in an evening to bring a nice TUI experience to Omegle.
 
 ## Running & Usage
 Use `requirements.txt` to get the requirements.
