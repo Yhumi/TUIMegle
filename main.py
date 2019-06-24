@@ -21,13 +21,14 @@ class omegleForm(npyscreen.FormBaseNew):
             curses.ascii.CR: self.sendMessage,
             curses.KEY_ENTER: self.sendMessage,
             "^V": self.pasteFromClipboard,
-            curses.KEY_UP: self.usePrevious,
-            curses.KEY_DOWN: self.returnToOverwritten
+            curses.KEY_UP: self.moveThroughList,
+            curses.KEY_DOWN: self.moveThroughList
         }
 
-        #A way of bringing back the previous sent message, for whatever reason
-        self.previousMessage = ""
-        self.overwittenMessage = ""
+        #A way of bringing back any previous sent message, for whatever reason
+        self.previousMessages = []
+        self.currentIndex = 0
+        self.overwitten = ""
 
         #The chatbox
         self.Chat = self.add(omegleChat, name="Chat", max_height=40)
@@ -41,8 +42,11 @@ class omegleForm(npyscreen.FormBaseNew):
         value = self.Message.value
         self.Message.value = ""
 
-        #Set the previous message to the newly sent message
-        self.previousMessage = value
+        #Append the newest message
+        self.previousMessages += [value]
+
+        #Move the message index
+        self.currentIndex = len(self.previousMessages)
 
         #Send it to the app above
         self.parentApp.onNewMessage(value)
@@ -75,19 +79,47 @@ class omegleForm(npyscreen.FormBaseNew):
             #Move it to the new index
             self.setCursorPosition(newCursorIndex)
 
-    def usePrevious(self, _input):
-        #Overwrite the current message with the previous but also set the overwitten message to the overwritten one
-        if self.previousMessage != "":
-            self.overwittenMessage = self.Message.entry_widget.value
-            self.Message.entry_widget.value = self.previousMessage
+    def moveThroughList(self, _input):
+        #If there are no previous message nothing can happen
+        if len(self.previousMessages) == 0:
+            return
 
-        #Move the cursor to the end of the box
-        self.setCursorPosition()
+        #Get the index of the chosen movement direction
+        if _input == curses.KEY_UP:
+            #Remove one from the current index
+            newIndex = self.currentIndex - 1
+        else:
+            #If we pick down and we're at the latest position, nothing should be done
+            if self.currentIndex >= len(self.previousMessages):
+                return
+            
+            #Otherwise, add 1 to the current index
+            newIndex = self.currentIndex + 1
 
-    def returnToOverwritten(self, _input):
-        #Return to the overwitten message
-        if self.overwittenMessage != "":
-            self.Message.entry_widget.value = self.overwittenMessage
+        #Some sanity checking
+        #If it's below 0, there's nothing else
+        if newIndex < 0:
+            newIndex = 0
+
+        #If the new index is >= the length of the list we're going back to the overwitten message
+        if newIndex >= len(self.previousMessages):            
+            #Simply set the current message properly and ensure the index is at the end
+            self.Message.entry_widget.value = self.overwitten
+            self.currentIndex = len(self.previousMessages)
+        else:
+            #Check to see if the previous index is the last index
+            if self.currentIndex == len(self.previousMessages):
+                #Save the current message
+                self.overwitten = self.Message.entry_widget.value
+
+            #Now we can get the new index's message
+            newMessage = self.previousMessages[newIndex]
+
+            #We've moved, so we need to overwrite the current index
+            self.currentIndex = newIndex
+
+            #Replace the new message
+            self.Message.entry_widget.value = newMessage
 
         #Move the cursor to the end of the box
         self.setCursorPosition()
