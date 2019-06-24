@@ -128,6 +128,6 @@ class OmegleBot(OmegleHandler):
 
         #Cut the string into chunks of lengthcap if needed
         if len(outstring) > lengthcap:
-            self.form.Chat.entry_widget.buffer([outstring[i:i+lengthcap] for i in range(0, len(outstring), lengthcap)])
+            self.form.Chat.entry_widget.buffer([outstring[i:i+lengthcap] for i in range(0, len(outstring), lengthcap)], scroll_if_editing=True)
         else:
-            self.form.Chat.entry_widget.buffer([outstring])
+            self.form.Chat.entry_widget.buffer([outstring], scroll_if_editing=True)

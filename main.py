@@ -7,6 +7,9 @@ import time
 import json
 import pyperclip
 import codecs
+import math
+import re
+import webbrowser
 
 # Redirect stdout and stderr to files
 import sys
@@ -145,7 +148,7 @@ class omegleApplication(npyscreen.NPSAppManaged):
         self.form = self.addForm('MAIN', omegleForm, name='Omegle')
         
         #Pre-creation of bot
-        self.form.Chat.entry_widget.buffer(["Creating OmegleBot..."])
+        self.form.Chat.entry_widget.buffer(["Creating OmegleBot..."], scroll_if_editing=True)
         self.omegleBot = None
         self.client = None
 
@@ -189,7 +192,7 @@ class omegleApplication(npyscreen.NPSAppManaged):
         self.omegleBot = OmegleBot(self.form, True, startline)
 
         #Creating client with topics from file
-        self.form.Chat.entry_widget.buffer(["Connecting..."])
+        self.form.Chat.entry_widget.buffer(["Connecting..."], scroll_if_editing=True)
         self.form.display()
 
         self.client = OmegleClient(self.omegleBot, wpm=42, lang='en', topics=clientdata["topics"])
@@ -213,9 +216,9 @@ class omegleApplication(npyscreen.NPSAppManaged):
                 self.form.chat = []
                 self.client.disconnect()
 
-                self.form.Chat.entry_widget.buffer(["Exiting... Bye!"])
+                self.form.Chat.entry_widget.buffer(["Exiting... Bye!"], scroll_if_editing=True)
                 self.form.display()
-                time.sleep(5)
+                time.sleep(3)
                 exit(0)
 
             #Recreates the bot - allowing you to update the setup.json
@@ -253,9 +256,9 @@ class omegleApplication(npyscreen.NPSAppManaged):
 
         #Cut the string into chunks of lengthcap if needed
         if len(outstring) > lengthcap:
-            self.form.Chat.entry_widget.buffer([outstring[i:i+lengthcap] for i in range(0, len(outstring), lengthcap)])
+            self.form.Chat.entry_widget.buffer([outstring[i:i+lengthcap] for i in range(0, len(outstring), lengthcap)], scroll_if_editing=True)
         else:
-            self.form.Chat.entry_widget.buffer([outstring])
+            self.form.Chat.entry_widget.buffer([outstring], scroll_if_editing=True)
 
     def shortcutSend(self, shortcut):
         #Check we're good
@@ -297,9 +300,103 @@ class omegleTextbox(npyscreen.Textfield):
         #Also check to see if we're typing or not
         self.parent.parentApp.userIsTyping()
 
+#Custom buffer pager
+class omegleBufferPager(npyscreen.BufferPager):
+    def __init__(self, screen, maxlen=False, *args, **keywords):
+        #Run the usual init
+        super(omegleBufferPager, self).__init__(screen, *args, **keywords)
+
+        #Set to true, important
+        self.interested_in_mouse_even_when_not_editable = True
+
+    
+
 #Boxtitles for the widgets (makes it look prettier)
 class omegleChat(npyscreen.BoxTitle):
-    _contained_widget = npyscreen.BufferPager
+    _contained_widget = omegleBufferPager
+
+    def handle_mouse_event(self, mouse_event):
+        #Event
+        mouse_id, rel_x, rel_y, z, bstate = self.interpret_mouse_event(mouse_event)
+
+        print("click")
+
+        #Okay this is going to be epic
+        #Okay so this is going to be some mathemagic to get the positon of the text under the cursor
+        #Take the display's starting position the height of the widget, do some flooring magical shit
+        cursorLine = rel_y // self.entry_widget._contained_widget_height + self.entry_widget.start_display_at
+
+        #Get the text for that line
+        if cursorLine <= len(self.entry_widget.values):
+            cursorLineText = self.entry_widget.values[cursorLine - 1]
+        else:
+            return
+
+        #We now need to do some magical shit with the x involving character width average floored? This is such a FUCKING mess
+        #Find the character widths for the line
+        allCharWidth = []
+        for x in cursorLineText:
+            allCharWidth += [self.find_width_of_char(x)]
+
+        #Calculate the average, and floor it 
+        averageCharacterWidth = math.floor(sum(allCharWidth) / len(allCharWidth))
+
+        #Okay so now we're flooring the average width vs relative x
+        cursorIndex = int(rel_x // averageCharacterWidth)
+
+        #Letter position
+        #Take 2 away as the line starts with an empty space of 1 character width
+        letterIndex = cursorIndex - 2
+
+        #Now then we can get the character for one thing
+        #There's 1 width of character space at the start to be accounted for
+        if cursorIndex <= len(cursorLineText) - 1:         
+            clickedLetter = cursorLineText[letterIndex]
+        else:
+            return
+
+        #If a space is clicked, nothing
+        if clickedLetter == ' ':
+            return
+
+        #Using the getClosestWord function to get the closes word
+        wordClicked = self.getClosestWord(cursorLineText, letterIndex)
+
+        #Now we can check if the word is a URL - If it is, open it
+        if self.checkURL(wordClicked):
+            webbrowser.open(wordClicked, new=0, autoraise=True)
+
+    def getClosestWord(self, string, position):
+        #Search the beginning for the last space in the string
+        #As we always add one to the beginning index to remove the space, if it fails and -1 is returned it will actually act as normal. Neat.
+        beginningSpaceIndex = string[:position+1].rfind(' ')
+
+        #Set to the beginning of the string ifnothing is found
+        if beginningSpaceIndex == -1:
+            beginningSpaceIndex = 0
+
+        #End search
+        endingSpaceIndex = string.find(' ', position)
+
+        #Set to the length of the string so the -1 function works if it doesn't find anything
+        if endingSpaceIndex == -1:
+            endingSpaceIndex = len(string)
+
+        #Now we return the word with whitespace removed
+        return string[beginningSpaceIndex:endingSpaceIndex].strip()
+
+    def checkURL(self, string):
+        #Django URL check
+        regex = re.compile(
+            r'^(?:http|ftp)s?://' # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+            r'localhost|' #localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+            r'(?::\d+)?' # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+        #Returns true if there is a match
+        return re.match(regex, string) is not None
 
 class omegleMessageBox(npyscreen.BoxTitle):
     _contained_widget = omegleTextbox
