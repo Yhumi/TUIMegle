@@ -1,6 +1,5 @@
 import npyscreen
 import curses
-import curses.ascii
 import threading
 from omeglebot import OmegleBot
 from pyomegle import OmegleClient, OmegleHandler
