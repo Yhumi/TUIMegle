@@ -58,9 +58,18 @@ class omegleForm(npyscreen.FormBaseNew):
         #Get clipboard
         clipboardtext = pyperclip.paste()
 
-        #This is dirty (also only pastes at the end of the message regardless, will fix this up)
+        #This is dirty 
         if isinstance(clipboardtext, basestring):
-            self.Message.entry_widget.value += clipboardtext
+            #We need to get the current cursor position
+            cursorIndex = self.Message.entry_widget.cursor_position
+
+            #Get the current value of the string
+            currentValue = self.Message.entry_widget.value
+
+            #Manipulate that string
+            self.Message.entry_widget.value = currentValue[:cursorIndex] + clipboardtext + currentValue[cursorIndex:]
+
+            #Move the cursor to the end of the paste
             for _ in range(len(clipboardtext)):
                 self.Message.entry_widget.h_cursor_right(None)
 
