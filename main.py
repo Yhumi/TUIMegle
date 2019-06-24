@@ -69,9 +69,11 @@ class omegleForm(npyscreen.FormBaseNew):
             #Manipulate that string
             self.Message.entry_widget.value = currentValue[:cursorIndex] + clipboardtext + currentValue[cursorIndex:]
 
-            #Move the cursor to the end of the paste
-            for _ in range(len(clipboardtext)):
-                self.Message.entry_widget.h_cursor_right(None)
+            #Lets attempt a cleaner approach to moving the cursor
+            newCursorIndex = cursorIndex + len(clipboardtext)
+
+            #Move it to the new index
+            self.setCursorPosition(newCursorIndex)
 
     def usePrevious(self, _input):
         #Overwrite the current message with the previous but also set the overwitten message to the overwritten one
@@ -80,7 +82,7 @@ class omegleForm(npyscreen.FormBaseNew):
             self.Message.entry_widget.value = self.previousMessage
 
         #Move the cursor to the end of the box
-        self.moveToEnd()
+        self.setCursorPosition()
 
     def returnToOverwritten(self, _input):
         #Return to the overwitten message
@@ -88,11 +90,18 @@ class omegleForm(npyscreen.FormBaseNew):
             self.Message.entry_widget.value = self.overwittenMessage
 
         #Move the cursor to the end of the box
-        self.moveToEnd()
+        self.setCursorPosition()
 
-    def moveToEnd(self):
-        for _ in range(len(self.Message.entry_widget.value)):
-            self.Message.entry_widget.h_cursor_right(None)
+    def setCursorPosition(self, specificPosition=None):
+        #If no position is specified, it will default to moving the cursor to the end of the string
+        if specificPosition == None:
+            specificPosition = len(self.Message.entry_widget.value)
+        
+        #Move the cursor
+        self.Message.entry_widget.cursor_position = specificPosition
+
+        #Update the drawing
+        self.display()       
 
 class omegleApplication(npyscreen.NPSAppManaged):
     def onStart(self):
