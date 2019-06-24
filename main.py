@@ -20,8 +20,14 @@ class omegleForm(npyscreen.FormBaseNew):
             curses.ascii.NL: self.sendMessage,
             curses.ascii.CR: self.sendMessage,
             curses.KEY_ENTER: self.sendMessage,
-            "^V": self.pasteFromClipboard
+            "^V": self.pasteFromClipboard,
+            curses.KEY_UP: self.usePrevious,
+            curses.KEY_DOWN: self.returnToOverwritten
         }
+
+        #A way of bringing back the previous sent message, for whatever reason
+        self.previousMessage = ""
+        self.overwittenMessage = ""
 
         #The chatbox
         self.Chat = self.add(omegleChat, name="Chat", max_height=40)
@@ -34,6 +40,9 @@ class omegleForm(npyscreen.FormBaseNew):
         #Get val
         value = self.Message.value
         self.Message.value = ""
+
+        #Set the previous message to the newly sent message
+        self.previousMessage = value
 
         #Send it to the app above
         self.parentApp.onNewMessage(value)
@@ -49,11 +58,32 @@ class omegleForm(npyscreen.FormBaseNew):
         #Get clipboard
         clipboardtext = pyperclip.paste()
 
-        #This is dirty
+        #This is dirty (also only pastes at the end of the message regardless, will fix this up)
         if isinstance(clipboardtext, basestring):
             self.Message.entry_widget.value += clipboardtext
             for _ in range(len(clipboardtext)):
                 self.Message.entry_widget.h_cursor_right(None)
+
+    def usePrevious(self, _input):
+        #Overwrite the current message with the previous but also set the overwitten message to the overwritten one
+        if self.previousMessage != "":
+            self.overwittenMessage = self.Message.entry_widget.value
+            self.Message.entry_widget.value = self.previousMessage
+
+        #Move the cursor to the end of the box
+        self.moveToEnd()
+
+    def returnToOverwritten(self, _input):
+        #Return to the overwitten message
+        if self.overwittenMessage != "":
+            self.Message.entry_widget.value = self.overwittenMessage
+
+        #Move the cursor to the end of the box
+        self.moveToEnd()
+
+    def moveToEnd(self):
+        for _ in range(len(self.Message.entry_widget.value)):
+            self.Message.entry_widget.h_cursor_right(None)
 
 class omegleApplication(npyscreen.NPSAppManaged):
     def onStart(self):
