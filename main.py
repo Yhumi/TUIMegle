@@ -309,8 +309,6 @@ class omegleBufferPager(npyscreen.BufferPager):
         #Set to true, important
         self.interested_in_mouse_even_when_not_editable = True
 
-    
-
 #Boxtitles for the widgets (makes it look prettier)
 class omegleChat(npyscreen.BoxTitle):
     _contained_widget = omegleBufferPager
@@ -318,8 +316,6 @@ class omegleChat(npyscreen.BoxTitle):
     def handle_mouse_event(self, mouse_event):
         #Event
         mouse_id, rel_x, rel_y, z, bstate = self.interpret_mouse_event(mouse_event)
-
-        print("click")
 
         #Okay this is going to be epic
         #Okay so this is going to be some mathemagic to get the positon of the text under the cursor
