@@ -13,6 +13,10 @@ import sys
 sys.stdout = codecs.open('logging/stdout.log', 'w', encoding="utf-8")
 sys.stderr = codecs.open('logging/stderr.log', 'w', encoding="utf-8")
 
+#Locale issue, maybe?
+import locale
+locale.setlocale(locale.LC_ALL, '')
+
 class omegleForm(npyscreen.FormBaseNew):
     def create(self):
         #Override handlers for the messagebox
